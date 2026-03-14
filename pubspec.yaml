@@ -44,7 +44,7 @@ dependencies:
   qr_flutter: ^4.1.0
 
   # --- Serialization ---
-  messagepack: ^0.2.2
+  msgpack_dart: ^1.0.1
 
   # --- Compression (zstd via FFI) ---
   archive: ^3.6.1          # fallback gzip; replace with flutter_zstd when stable
