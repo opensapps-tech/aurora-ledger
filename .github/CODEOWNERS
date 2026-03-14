@@ -1,0 +1,10 @@
+# Global owner
+* @your-github-username
+
+# Crypto layer — requires careful review
+lib/infrastructure/crypto/ @your-github-username
+lib/infrastructure/sync/ @your-github-username
+lib/infrastructure/crdt/ @your-github-username
+
+# CI/CD
+.github/ @your-github-username

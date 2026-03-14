@@ -1,0 +1,2 @@
+# Replace this file with a real pre-trained zstd dictionary.
+# Train using: zstd --train <sample_ops_dir>/* -o aurora_ops.dict

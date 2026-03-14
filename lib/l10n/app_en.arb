@@ -1,0 +1,76 @@
+{
+  "@@locale": "en",
+
+  "appName": "Aurora Ledger",
+  "@appName": { "description": "Application name" },
+
+  "onboardingWelcomeTitle": "Welcome to Aurora Ledger",
+  "onboardingWelcomeSubtitle": "Private expense sharing.\nNo servers. No accounts.",
+
+  "onboardingAliasPrompt": "What should we call you?",
+  "onboardingAliasHint": "Your display name",
+  "onboardingAliasInfo": "This is stored only on your device. It's purely cosmetic.",
+
+  "createGroupTitle": "New group",
+  "createGroupNameHint": "e.g. Spain Trip, Flat Expenses",
+  "createGroupCurrencyLabel": "Currency",
+
+  "joinGroupTitle": "Join group",
+  "joinGroupScanPrompt": "Scan the group invite QR",
+
+  "syncTitle": "Sync",
+  "syncPhase1Label": "Step 1 — Show your QR",
+  "syncPhase2Label": "Step 2 — Scan their QR",
+  "syncCompleteLabel": "Sync complete",
+  "syncFrameProgress": "{received} of {total} frames",
+  "@syncFrameProgress": {
+    "placeholders": {
+      "received": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "balancesTitle": "Balances",
+  "balanceOwes": "{name} owes {amount}",
+  "@balanceOwes": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "String" }
+    }
+  },
+  "balanceOwed": "{name} is owed {amount}",
+  "@balanceOwed": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "String" }
+    }
+  },
+  "balanceSettled": "All settled up",
+
+  "replicaWarnMessage": "Sync with a group member soon to protect your data.",
+  "replicaBlockMessage": "Sync required before adding new expenses.",
+
+  "addExpenseTitle": "Add expense",
+  "addExpenseAmountHint": "0.00",
+  "addExpenseNotesHint": "What was it for?",
+  "addExpensePayerLabel": "Paid by",
+  "addExpenseParticipantsLabel": "Split between",
+
+  "settingsTitle": "Settings",
+  "settingsBackupLabel": "Back up identity",
+  "settingsBackupSubtitle": "Export encrypted backup to your cloud storage.",
+
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorSyncDecrypt": "Could not decrypt sync data. Make sure you\\'re scanning the right group\\'s QR.",
+  "errorReplicaBlock": "Sync required. Open Aurora on another group member\\'s device to sync.",
+
+  "buttonContinue": "Continue",
+  "buttonCreate": "Create",
+  "buttonJoin": "Join",
+  "buttonDone": "Done",
+  "buttonCancel": "Cancel",
+  "buttonSync": "Sync",
+  "buttonAddExpense": "Add expense",
+  "buttonSettle": "Mark as settled",
+  "buttonBackUp": "Back up now"
+}
