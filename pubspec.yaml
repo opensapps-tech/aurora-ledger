@@ -24,15 +24,14 @@ dependencies:
 
   # --- Local database (drift + SQLCipher) ---
   drift: ^2.18.0
-  drift_sqflite: ^2.2.0
+  drift_flutter: ^0.2.0
   sqlite3_flutter_libs: ^0.5.20
-  sqflite: ^2.3.2
 
   # --- Cryptography (libsodium) ---
   # flutter_sodium (libsodium FFI bindings)
   # Replace with exact package name once confirmed for your flutter version
-  sodium_libs: ^2.3.1
-  sodium: ^2.3.1
+  sodium_libs: ">=3.0.0 <4.0.0"
+  sodium: ">=3.0.0 <4.0.0"
 
   # --- Secure key storage ---
   flutter_secure_storage: ^9.0.0
@@ -44,7 +43,7 @@ dependencies:
   qr_flutter: ^4.1.0
 
   # --- Serialization ---
-  messagepack: ^0.2.2
+  messagepack: ">=0.2.0 <0.3.0"
 
   # --- Compression (zstd via FFI) ---
   archive: ^3.6.1          # fallback gzip; replace with flutter_zstd when stable
@@ -76,9 +75,7 @@ dev_dependencies:
   drift_dev: ^2.18.0
   freezed: ^2.5.2
   json_serializable: ^6.8.0
-  riverpod_generator: ^2.4.3
-  custom_lint: ^0.6.4
-  riverpod_lint: ^2.3.13
+  riverpod_generator: 2.3.11
 
   # --- Testing ---
   mocktail: ^1.0.4
