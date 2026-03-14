@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../domain/entities/expense.dart';
 import 'package:intl/intl.dart';
+import '../../app/router.dart';
 
 class ExpenseListTile extends StatelessWidget {
   const ExpenseListTile({super.key, required this.expense});
@@ -34,7 +36,11 @@ class ExpenseListTile extends StatelessWidget {
         ),
       ),
       onTap: () {
-        // TODO: navigate to detail
+        context.push(
+          Routes.expenseDetail
+              .replaceFirst(':groupId', expense.groupId)
+              .replaceFirst(':expenseId', expense.expenseId),
+        );
       },
     );
   }

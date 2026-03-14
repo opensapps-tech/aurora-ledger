@@ -12,7 +12,7 @@ abstract interface class ExpenseRepository {
     required String notes,
   });
   Future<Result<Expense, Failure>> editExpense({required String expenseId, required Expense updated});
-  Future<Result<void, Failure>> deleteExpense({required String expenseId});
+  Future<Result<void, Failure>> deleteExpense({required String groupId, required String expenseId});
   Future<Result<List<Expense>, Failure>> getExpensesForGroup({required String groupId});
   Future<Result<void, Failure>> settlePayment({
     required String groupId,

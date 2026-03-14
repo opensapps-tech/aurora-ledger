@@ -102,16 +102,12 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   }
 
   @override
-  Future<Result<void, Failure>> deleteExpense({required String expenseId}) async {
+  Future<Result<void, Failure>> deleteExpense({required String groupId, required String expenseId}) async {
     try {
-      // Get the expense first to find its group
-      final expenses = await getExpensesForGroup(''); // We need the groupId
-      // This is a simplification - in real implementation, we'd query by expenseId
-      
       final payload = _buildDeleteExpensePayload(expenseId: expenseId);
 
       final operation = await _createAndSignOperation(
-        groupId: '', // Would be determined from context
+        groupId: groupId,
         type: OperationType.deleteExpense,
         payload: payload,
       );

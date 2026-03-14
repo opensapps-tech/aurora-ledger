@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../groups/groups_screen.dart';
 import '../settings/settings_screen.dart';
-import '../sync/sync_screen.dart'; // Though Sync is usually per-group, Phase 8.1 says 3 tabs.
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
