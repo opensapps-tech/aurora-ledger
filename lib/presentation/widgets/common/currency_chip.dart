@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 
-// TODO: Implement CurrencyChip widget
 class CurrencyChip extends StatelessWidget {
-  const CurrencyChip({super.key});
+  const CurrencyChip({
+    super.key,
+    required this.currency,
+    this.compact = false,
+  });
+
+  final String currency;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement
-    return const SizedBox.shrink();
+    return Chip(
+      visualDensity: compact ? VisualDensity.compact : VisualDensity.standard,
+      avatar: const Icon(Icons.currency_exchange, size: 16),
+      label: Text(currency.toUpperCase()),
+    );
   }
 }

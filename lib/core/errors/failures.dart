@@ -20,6 +20,16 @@ final class IdentityNotFoundFailure extends Failure {
   const IdentityNotFoundFailure() : super('No identity found. Please complete onboarding.');
 }
 
+
+final class AliasEmptyFailure extends Failure {
+  const AliasEmptyFailure() : super('Alias cannot be empty.');
+}
+
+final class AliasTooLongFailure extends Failure {
+  const AliasTooLongFailure(int maxLength)
+      : super('Alias cannot be longer than $maxLength characters.');
+}
+
 // --- Group ---
 final class GroupNotFoundFailure extends Failure {
   const GroupNotFoundFailure(super.message);
@@ -45,6 +55,12 @@ final class ReplicaThresholdFailure extends Failure {
 
 final class InvalidAmountFailure extends Failure {
   const InvalidAmountFailure() : super('Expense amount must be greater than zero.');
+}
+
+
+final class ParticipantsEmptyFailure extends Failure {
+  const ParticipantsEmptyFailure()
+      : super('Select at least one participant for the expense.');
 }
 
 // --- Sync ---

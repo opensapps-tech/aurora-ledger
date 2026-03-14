@@ -4,6 +4,8 @@ class AppConstants {
 
   static const String appName = 'Aurora Ledger';
   static const String appVersion = '0.1.0';
+  static const int minAliasLength = 1;
+  static const int maxAliasLength = 30;
 
   /// Max groups per identity to prevent unbounded DB growth.
   static const int maxGroupsPerIdentity = 50;

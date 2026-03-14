@@ -68,6 +68,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.addExpense,
         builder: (_, state) => AddExpenseScreen(groupId: state.pathParameters['groupId']!),
       ),
+
+      GoRoute(
+        path: Routes.expenseDetail,
+        builder: (_, state) => ExpenseDetailScreen(
+          groupId: state.pathParameters['groupId']!,
+          expenseId: state.pathParameters['expenseId']!,
+        ),
+      ),
       GoRoute(
         path: Routes.sync,
         builder: (_, state) => SyncScreen(groupId: state.pathParameters['groupId']!),

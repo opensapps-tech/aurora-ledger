@@ -1,3 +1,4 @@
+import 'package:aurora_ledger/core/constants/app_constants.dart';
 import 'package:aurora_ledger/core/errors/failures.dart';
 import 'package:aurora_ledger/core/utils/result.dart';
 import 'package:aurora_ledger/domain/entities/identity.dart';
@@ -8,10 +9,16 @@ class CreateIdentityUsecase {
   final IdentityRepository _repository;
 
   Future<Result<Identity, Failure>> call({required String alias, String? avatarPath}) async {
-    // TODO: Validate alias is non-empty and within length limits.
-    if (alias.trim().isEmpty) {
-      return const Result.err(IdentityNotFoundFailure()); // TODO: add AliasEmptyFailure
+    final normalizedAlias = alias.trim();
+
+    if (normalizedAlias.isEmpty) {
+      return const Result.err(AliasEmptyFailure());
     }
-    return _repository.createIdentity(alias: alias.trim(), avatarPath: avatarPath);
+
+    if (normalizedAlias.length > AppConstants.maxAliasLength) {
+      return const Result.err(AliasTooLongFailure(AppConstants.maxAliasLength));
+    }
+
+    return _repository.createIdentity(alias: normalizedAlias, avatarPath: avatarPath);
   }
 }

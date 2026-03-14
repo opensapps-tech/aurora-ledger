@@ -28,7 +28,7 @@ class AddExpenseUsecase {
 
     if (amountMinorUnits <= 0) return const Result.err(InvalidAmountFailure());
     if (participantIdentityIds.isEmpty) {
-      return const Result.err(InvalidAmountFailure()); // TODO: add ParticipantsEmptyFailure
+      return const Result.err(ParticipantsEmptyFailure());
     }
 
     return _expenseRepository.addExpense(
