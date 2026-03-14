@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../data/database/app_database.dart';
 import '../../data/repositories/expense_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
@@ -57,61 +58,68 @@ final compressorProvider = Provider((_) => const ZstdCompressor());
 final rsCodecProvider = Provider((_) => const ReedSolomonCodec());
 final frameEncoderProvider = Provider((ref) => QrFrameEncoder(ref.read(rsCodecProvider)));
 final conflictResolverProvider = Provider((_) => const ConflictResolver());
+final syncPayloadBuilderProvider = Provider((ref) => SyncPayloadBuilder(
+      ref.read(msgpackProvider),
+      ref.read(compressorProvider),
+      ref.read(cryptoServiceProvider),
+      ref.read(keyStorageProvider),
+      ref.read(frameEncoderProvider),
+    ));
+final syncPayloadParserProvider = Provider((ref) => SyncPayloadParser(
+      ref.read(msgpackProvider),
+      ref.read(compressorProvider),
+      ref.read(cryptoServiceProvider),
+      ref.read(keyStorageProvider),
+    ));
 
 // Repositories
-final identityRepositoryProvider = Provider<IdentityRepository>((ref) =>
-    IdentityRepositoryImpl(
+final identityRepositoryProvider = Provider<IdentityRepository>((ref) => IdentityRepositoryImpl(
       ref.read(identityDaoProvider),
       ref.read(cryptoServiceProvider),
       ref.read(keyStorageProvider),
     ));
 
-final groupRepositoryProvider = Provider<GroupRepository>((ref) =>
-    GroupRepositoryImpl(
+final groupRepositoryProvider = Provider<GroupRepository>((ref) => GroupRepositoryImpl(
       ref.read(groupDaoProvider),
       ref.read(cryptoServiceProvider),
       ref.read(keyStorageProvider),
     ));
 
-final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) =>
-    ExpenseRepositoryImpl(
+final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) => ExpenseRepositoryImpl(
       ref.read(operationDaoProvider),
       ref.read(cryptoServiceProvider),
       ref.read(keyStorageProvider),
       ref.read(hlcProvider),
-      ref.read(msgpackProvider),
+      ref.read(conflictResolverProvider),
     ));
 
-final syncRepositoryProvider = Provider<SyncRepository>((ref) =>
-    SyncRepositoryImpl(
+final syncRepositoryProvider = Provider<SyncRepository>((ref) => SyncRepositoryImpl(
       ref.read(operationDaoProvider),
       ref.read(groupDaoProvider),
+      ref.read(cryptoServiceProvider),
+      ref.read(hlcProvider),
+      ref.read(syncPayloadBuilderProvider),
+      ref.read(syncPayloadParserProvider),
     ));
 
 // Use cases
-final createIdentityUsecaseProvider = Provider((ref) =>
-    CreateIdentityUsecase(ref.read(identityRepositoryProvider)));
-final getIdentityUsecaseProvider = Provider((ref) =>
-    GetIdentityUsecase(ref.read(identityRepositoryProvider)));
-final createGroupUsecaseProvider = Provider((ref) =>
-    CreateGroupUsecase(ref.read(groupRepositoryProvider)));
-final joinGroupUsecaseProvider = Provider((ref) =>
-    JoinGroupUsecase(ref.read(groupRepositoryProvider)));
+final createIdentityUsecaseProvider =
+    Provider((ref) => CreateIdentityUsecase(ref.read(identityRepositoryProvider)));
+final getIdentityUsecaseProvider =
+    Provider((ref) => GetIdentityUsecase(ref.read(identityRepositoryProvider)));
+final createGroupUsecaseProvider =
+    Provider((ref) => CreateGroupUsecase(ref.read(groupRepositoryProvider)));
+final joinGroupUsecaseProvider =
+    Provider((ref) => JoinGroupUsecase(ref.read(groupRepositoryProvider)));
 final addExpenseUsecaseProvider = Provider((ref) =>
     AddExpenseUsecase(ref.read(expenseRepositoryProvider), ref.read(syncRepositoryProvider)));
-final settlePaymentUsecaseProvider = Provider((ref) =>
-    SettlePaymentUsecase(ref.read(expenseRepositoryProvider)));
+final settlePaymentUsecaseProvider =
+    Provider((ref) => SettlePaymentUsecase(ref.read(expenseRepositoryProvider)));
 final computeBalancesUsecaseProvider = Provider((_) => const ComputeBalancesUsecase());
 final simplifyDebtsUsecaseProvider = Provider((_) => const SimplifyDebtsUsecase());
-final prepareSyncUsecaseProvider = Provider((ref) {
-  final builder = SyncPayloadBuilder(
-    ref.read(msgpackProvider),
-    ref.read(compressorProvider),
-    ref.read(cryptoServiceProvider),
-    ref.read(keyStorageProvider),
-    ref.read(frameEncoderProvider),
-  );
-  return PrepareSyncPacketUsecase(ref.read(syncRepositoryProvider), builder);
-});
-final applySyncUsecaseProvider = Provider((ref) =>
-    ApplySyncPacketUsecase(ref.read(syncRepositoryProvider), ref.read(groupRepositoryProvider)));
+final prepareSyncUsecaseProvider = Provider(
+  (ref) => PrepareSyncPacketUsecase(ref.read(syncRepositoryProvider), ref.read(syncPayloadBuilderProvider)),
+);
+final applySyncUsecaseProvider = Provider(
+  (ref) => ApplySyncPacketUsecase(ref.read(syncRepositoryProvider), ref.read(groupRepositoryProvider)),
+);
