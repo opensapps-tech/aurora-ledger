@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../domain/entities/balance.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/groups/groups_screen.dart';
@@ -16,6 +17,7 @@ import '../screens/sync/qr_display_screen.dart';
 import '../screens/sync/qr_scan_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/backup_screen.dart';
+import '../providers/service_providers.dart';
 
 // Route name constants
 class Routes {
@@ -38,9 +40,20 @@ class Routes {
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
-  // TODO: Read identity state from Riverpod to determine initial route.
   return GoRouter(
-    initialLocation: Routes.onboarding,
+    initialLocation: Routes.home,
+    redirect: (context, state) async {
+      final hasIdentity = await ref.read(identityRepositoryProvider).hasIdentity();
+      final isGoingToOnboarding = state.matchedLocation == Routes.onboarding;
+
+      if (!hasIdentity && !isGoingToOnboarding) {
+        return Routes.onboarding;
+      }
+      if (hasIdentity && isGoingToOnboarding) {
+        return Routes.home;
+      }
+      return null;
+    },
     routes: [
       GoRoute(path: Routes.onboarding, builder: (_, __) => const OnboardingScreen()),
       GoRoute(path: Routes.home, builder: (_, __) => const HomeScreen()),
@@ -70,6 +83,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.balances,
         builder: (_, state) => BalancesScreen(groupId: state.pathParameters['groupId']!),
+      ),
+      GoRoute(
+        path: Routes.settlement,
+        builder: (_, state) => SettlementScreen(
+          groupId: state.pathParameters['groupId']!,
+          settlement: state.extra as Settlement,
+        ),
       ),
       GoRoute(path: Routes.settings, builder: (_, __) => const SettingsScreen()),
       GoRoute(path: Routes.backup, builder: (_, __) => const BackupScreen()),

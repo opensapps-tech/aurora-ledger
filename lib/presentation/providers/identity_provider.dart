@@ -1,11 +1,27 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-// TODO: import use cases and entities
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../core/errors/failures.dart';
+import '../../core/utils/result.dart';
+import '../../domain/entities/identity.dart';
+import 'service_providers.dart';
 
-// TODO: implement IdentityNotifier using Riverpod AsyncNotifier
-// Pattern:
-//   final identityProvider = AsyncNotifierProvider<IdentityNotifier, YourState>(IdentityNotifier.new);
-//
-//   class IdentityNotifier extends AsyncNotifier<YourState> {
-//     @override
-//     Future<YourState> build() async { ... }
-//   }
+part 'identity_provider.g.dart';
+
+@riverpod
+class IdentityNotifier extends _$IdentityNotifier {
+  @override
+  Future<Identity?> build() async {
+    final result = await ref.read(getIdentityUsecaseProvider).call();
+    return result.when(
+      ok: (identity) => identity,
+      err: (_) => null,
+    );
+  }
+
+  Future<Result<Identity, Failure>> create({required String alias}) async {
+    final result = await ref.read(createIdentityUsecaseProvider).call(alias: alias);
+    if (result.isOk) {
+      ref.invalidateSelf();
+    }
+    return result;
+  }
+}
