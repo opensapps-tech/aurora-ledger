@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:aurora_ledger/core/errors/failures.dart';
 import 'package:aurora_ledger/core/utils/result.dart';
 import 'package:aurora_ledger/data/database/daos/group_dao.dart';
 import 'package:aurora_ledger/data/database/daos/operation_dao.dart';
+import 'package:aurora_ledger/data/database/tables/operations_table.dart';
 import 'package:aurora_ledger/domain/entities/operation.dart';
 import 'package:aurora_ledger/domain/repositories/sync_repository.dart';
 import 'package:aurora_ledger/infrastructure/crdt/hybrid_logical_clock.dart';
 import 'package:aurora_ledger/infrastructure/crypto/crypto_service.dart';
-import 'package:aurora_ledger/infrastructure/sync/qr_frame_encoder.dart';
 import 'package:aurora_ledger/infrastructure/sync/sync_payload_builder.dart';
 import 'package:aurora_ledger/infrastructure/sync/sync_payload_parser.dart';
 
@@ -18,7 +20,6 @@ class SyncRepositoryImpl implements SyncRepository {
     this._hlc,
     this._payloadBuilder,
     this._payloadParser,
-    this._frameEncoder,
   );
 
   final OperationDao _operationDao;
@@ -27,7 +28,6 @@ class SyncRepositoryImpl implements SyncRepository {
   final HybridLogicalClock _hlc;
   final SyncPayloadBuilder _payloadBuilder;
   final SyncPayloadParser _payloadParser;
-  final QrFrameEncoder _frameEncoder;
 
   @override
   Future<Result<List<Operation>, Failure>> collectMissingOperations({
@@ -35,20 +35,10 @@ class SyncRepositoryImpl implements SyncRepository {
     required List<String> remoteKnownOperationIds,
   }) async {
     try {
-      final localKnownIds = await _operationDao.getKnownOperationIds(groupId);
-      final remoteKnownIds = remoteKnownOperationIds.toSet();
-
-      // Find operations local has that remote doesn't
-      final missingIds = localKnownIds.difference(remoteKnownIds);
-
-      if (missingIds.isEmpty) {
-        return const Result.ok([]);
-      }
-
-      // Get all local operations and filter
       final allOps = await _operationDao.getOperationsForGroup(groupId);
+      final remoteKnownIds = remoteKnownOperationIds.toSet();
       final missingOps = allOps
-          .where((row) => missingIds.contains(row.operationId))
+          .where((row) => !remoteKnownIds.contains(row.operationId))
           .map(_rowToOperation)
           .toList();
 
@@ -65,35 +55,24 @@ class SyncRepositoryImpl implements SyncRepository {
   }) async {
     try {
       var appliedCount = 0;
-      final rejectedOperations = <Operation>[];
-
-      // Get known operation IDs to check for duplicates
       final knownIds = await _operationDao.getKnownOperationIds(groupId);
 
       for (final op in operations) {
-        // 1. Verify signature
         final signingPayload = _cryptoService.operationSigningPayload(op);
+        final publicKey = base64Decode(op.authorPublicKey);
         final isValid = await _cryptoService.verify(
           message: signingPayload,
           signature: op.signature,
-          publicKey: _base64Decode(op.authorPublicKey),
+          publicKey: publicKey,
         );
 
-        if (!isValid) {
-          rejectedOperations.add(op);
+        if (!isValid || knownIds.contains(op.operationId)) {
           continue;
         }
 
-        // 2. Check for duplicates
-        if (knownIds.contains(op.operationId)) {
-          continue;
-        }
-
-        // 3. Advance HLC
         _hlc.receive(op.hlcTimestamp);
-
-        // 4. Insert operation
         await _insertOperation(op);
+        knownIds.add(op.operationId);
         appliedCount++;
       }
 
@@ -157,7 +136,7 @@ class SyncRepositoryImpl implements SyncRepository {
     return DateTime.fromMillisecondsSinceEpoch(row.lastSyncedAtMs!);
   }
 
-  Operation _rowToOperation(dynamic row) => Operation(
+  Operation _rowToOperation(OperationRow row) => Operation(
         operationId: row.operationId,
         groupId: row.groupId,
         authorPublicKey: row.authorPublicKey,
@@ -171,31 +150,18 @@ class SyncRepositoryImpl implements SyncRepository {
       );
 
   Future<void> _insertOperation(Operation op) async {
-    // Import the table here to avoid circular dependencies
-    final companion = await _createOperationCompanion(op);
+    final companion = OperationsTableCompanion.insert(
+      operationId: op.operationId,
+      groupId: op.groupId,
+      authorPublicKey: op.authorPublicKey,
+      hlcPhysicalMs: op.hlcTimestamp.physicalMs,
+      hlcLogical: op.hlcTimestamp.logical,
+      operationType: op.type.index,
+      payload: op.payload,
+      signature: op.signature,
+      insertedAtMs: DateTime.now().millisecondsSinceEpoch,
+    );
+
     await _operationDao.insertOperation(companion);
-  }
-
-  Future<dynamic> _createOperationCompanion(Operation op) async {
-    // This is a workaround to avoid importing the table directly
-    // In practice, we'd use a proper repository pattern
-    // For now, return a map that the DAO can handle
-    return {
-      'operationId': op.operationId,
-      'groupId': op.groupId,
-      'authorPublicKey': op.authorPublicKey,
-      'hlcPhysicalMs': op.hlcTimestamp.physicalMs,
-      'hlcLogical': op.hlcTimestamp.logical,
-      'operationType': op.type.index,
-      'payload': op.payload,
-      'signature': op.signature,
-      'insertedAtMs': DateTime.now().millisecondsSinceEpoch,
-    };
-  }
-
-  List<int> _base64Decode(String encoded) {
-    // This would be actual base64 decoding
-    // For now, return empty list as placeholder
-    return [];
   }
 }

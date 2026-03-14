@@ -1,3 +1,4 @@
+import 'package:aurora_ledger/core/extensions/datetime_extensions.dart';
 import 'package:equatable/equatable.dart';
 
 /// A shared expense group.
@@ -30,7 +31,7 @@ class Group extends Equatable {
 
   bool get requiresSyncWarning {
     if (lastSyncedAt == null) return memberPublicKeys.length > 1;
-    return lastSyncedAt!.isOlderThan(hours: 24); // TODO: import extension
+    return lastSyncedAt!.isOlderThan(hours: 24);
   }
 
   @override
