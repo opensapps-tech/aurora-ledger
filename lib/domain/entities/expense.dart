@@ -6,7 +6,7 @@ class Expense extends Equatable {
   const Expense({
     required this.expenseId,
     required this.groupId,
-    required this.amount,
+    required this.amountMinorUnits,
     required this.currency,
     required this.payerIdentityId,
     required this.participantIdentityIds,
@@ -47,4 +47,32 @@ class Expense extends Equatable {
         expenseId, groupId, amountMinorUnits, currency,
         payerIdentityId, participantIdentityIds, notes, createdAt, isDeleted,
       ];
+
+  Expense copyWith({
+    String? expenseId,
+    String? groupId,
+    int? amountMinorUnits,
+    String? currency,
+    String? payerIdentityId,
+    List<String>? participantIdentityIds,
+    String? notes,
+    DateTime? createdAt,
+    String? authorPublicKey,
+    bool? isDeleted,
+    DateTime? editedAt,
+  }) {
+    return Expense(
+      expenseId: expenseId ?? this.expenseId,
+      groupId: groupId ?? this.groupId,
+      amountMinorUnits: amountMinorUnits ?? this.amountMinorUnits,
+      currency: currency ?? this.currency,
+      payerIdentityId: payerIdentityId ?? this.payerIdentityId,
+      participantIdentityIds: participantIdentityIds ?? this.participantIdentityIds,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      authorPublicKey: authorPublicKey ?? this.authorPublicKey,
+      isDeleted: isDeleted ?? this.isDeleted,
+      editedAt: editedAt ?? this.editedAt,
+    );
+  }
 }
