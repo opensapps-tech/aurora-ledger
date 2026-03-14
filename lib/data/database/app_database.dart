@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:drift_sqflite/drift_sqflite.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'tables/groups_table.dart';
 import 'tables/identities_table.dart';
 import 'tables/operations_table.dart';
@@ -36,8 +36,5 @@ class AppDatabase extends _$AppDatabase {
 
 QueryExecutor _openConnection() {
   // TODO: Replace with SQLCipher connection when sqflite_sqlcipher is integrated.
-  return SqfliteQueryExecutor.inDatabaseFolder(
-    path: 'aurora_ledger.db',
-    logStatements: false, // TODO: set to true in debug builds only
-  );
+  return driftDatabase(name: 'aurora_ledger');
 }
